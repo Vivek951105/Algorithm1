@@ -1,0 +1,107 @@
+
+import java.util.*;
+class Dictionary {
+
+  public LinkedHashMap<String, Integer> newDictionary(LinkedHashMap<String, Integer> D) {
+
+    LinkedHashMap<String, Integer> lhm= new LinkedHashMap<String, Integer>();
+    Map<Integer, Integer> map= new HashMap<>();
+
+    for(int i = 1; i <= 7; i++) {
+      if(i == 2) {
+        map.put(i, 28);
+        continue;
+      }
+      if(i % 2 == 1)
+        map.put(i, 31);
+      if(i % 2 == 0)
+        map.put(i, 30);
+    }
+    for(int i = 8; i <= 12; i++) {
+      if(i % 2 == 1)
+        map.put(i, 30);
+      if(i % 2 == 0)
+        map.put(i, 31);
+    }
+
+    ArrayList<String> keys= new ArrayList<>();
+    ArrayList<Integer> values= new ArrayList<>();
+
+    for(Map.Entry el : D.entrySet()) {
+      keys.add((String)el.getKey());
+      values.add((int)el.getValue());
+    }
+
+    for(int i = 0; i < keys.size()-1; ) {
+
+      String s1[]= keys.get(i).split("-");
+      String s2[]= keys.get(i+1).split("-");
+
+     
+      int year1= Integer.valueOf(s1[0]), year2= Integer.valueOf(s2[0]);
+      int month1= Integer.valueOf(s1[1]), month2= Integer.valueOf(s2[1]);
+      int day1= Integer.valueOf(s1[2]), day2= Integer.valueOf(s2[2]);
+
+      int year_diff= (year2 - year1) * 365;
+      int month_diff= 0;
+      for(int j = Math.min(month1, month2); j < Math.max(month1, month2); j++)
+        month_diff += map.get(j);
+
+      month_diff= (month2 - month1) < 0 ? -month_diff : month_diff;
+      int day_diff= day2 - day1;
+
+      int total_days= year_diff + month_diff + day_diff;
+
+      int increment= Math.abs(values.get(i+1)-values.get(i)) / total_days;
+      int curr_val= values.get(i);
+
+      
+      int ind= i;
+      for(int j = 1; j < total_days; j++) {
+        if(++day1 > map.get(month1)) {
+          day1= 1;
+          month1++;
+        }
+        if(month1 > 12) {
+          day1= month1= 1;
+          year1++;
+        }
+        String date= Integer.toString(year1)+"-"+Integer.toString(month1)+"-"+Integer.toString(day1);
+
+        
+        if(values.get(i) <= values.get(i+1))
+          curr_val += increment;
+        else
+          curr_val -= increment;
+
+      
+        keys.add(ind+1, date);
+        values.add(ind+1, curr_val);
+
+        ind++;
+      }
+
+      i += total_days;
+
+    }
+
+    for(int i = 0; i < keys.size(); i++)
+      lhm.put(keys.get(i), values.get(i));
+
+
+    return lhm;
+  }
+
+  public static void main(String[] args) {
+    Dictionary obj= new Dictionary();
+    LinkedHashMap<String, Integer> D= new LinkedHashMap<String, Integer>();
+    D.put("2019-1-1", 100);
+    D.put("2019-1-4", 115);
+
+    for(Map.Entry el : obj.newDictionary(D).entrySet()) {
+      System.out.println(el.getKey()+ " : " +el.getValue());
+    }
+  }
+
+}
+
